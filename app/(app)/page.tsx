@@ -8,11 +8,19 @@ import {
 } from "lucide-react";
 
 import { GlassCard } from "@/components/glass/glass-card";
+import { AnalysisSection } from "@/components/dashboard/analysis-section";
 import {
   TransactionList,
   type TxRow,
 } from "@/components/transactions/transaction-list";
 import { formatCompactCurrency, formatCurrency, formatRelativeDay } from "@/lib/format";
+import {
+  computeAnalysis,
+  type AnalysisBill,
+  type AnalysisIncome,
+  type AnalysisInstallment,
+  type AnalysisTx,
+} from "@/lib/analysis";
 import { requireActiveOrg } from "@/lib/session";
 import { createClient } from "@/utils/supabase/server";
 
@@ -35,9 +43,23 @@ export default async function HomePage() {
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
     .toISOString()
     .slice(0, 10);
+  // First day of the month two back — start of the rolling window for the
+  // 6-month analysis (past 3 months incl. current).
+  const analysisStart = new Date(now.getFullYear(), now.getMonth() - 2, 1)
+    .toISOString()
+    .slice(0, 10);
 
   const supabase = await createClient();
-  const [accountsRes, monthRes, recentRes, billsRes] = await Promise.all([
+  const [
+    accountsRes,
+    monthRes,
+    recentRes,
+    billsRes,
+    pastRes,
+    projBillsRes,
+    projIncomesRes,
+    projInstRes,
+  ] = await Promise.all([
     supabase
       .from("account_balances")
       .select("id,name,current_balance")
@@ -67,6 +89,26 @@ export default async function HomePage() {
       .eq("is_paid", false)
       .order("next_due_date", { ascending: true })
       .range(0, 2),
+    // --- 6-month analysis: past actuals + inputs for future projection ---
+    supabase
+      .from("transactions")
+      .select("type,amount,source,source_ref,transaction_date")
+      .eq("organization_id", ctx.activeOrgId)
+      .is("deleted_at", null)
+      .gte("transaction_date", analysisStart),
+    supabase
+      .from("bills")
+      .select("amount,frequency,next_due_date,is_paid")
+      .eq("organization_id", ctx.activeOrgId),
+    supabase
+      .from("recurring_incomes")
+      .select("amount,frequency,next_due_date,end_date,is_active")
+      .eq("organization_id", ctx.activeOrgId)
+      .eq("is_active", true),
+    supabase
+      .from("installments")
+      .select("installment_amount,paid_count,term_months,status")
+      .eq("organization_id", ctx.activeOrgId),
   ]);
 
   const accounts = (accountsRes.data ?? []) as AccountBalance[];
@@ -100,6 +142,14 @@ export default async function HomePage() {
 
   const recent = (recentRes.data ?? []) as unknown as TxRow[];
   const upcoming = (billsRes.data ?? []) as UpcomingBill[];
+
+  const analysis = computeAnalysis({
+    now,
+    transactions: (pastRes.data ?? []) as AnalysisTx[],
+    bills: (projBillsRes.data ?? []) as AnalysisBill[],
+    incomes: (projIncomesRes.data ?? []) as AnalysisIncome[],
+    installments: (projInstRes.data ?? []) as AnalysisInstallment[],
+  });
 
   return (
     <div className="space-y-4">
@@ -216,6 +266,8 @@ export default async function HomePage() {
         <span className="flex-1 text-sm font-medium">Kelola rekening</span>
         <ChevronRightIcon className="size-4 text-muted-foreground" />
       </Link>
+
+      <AnalysisSection analysis={analysis} currency={currency} />
     </div>
   );
 }
