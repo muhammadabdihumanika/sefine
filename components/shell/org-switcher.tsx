@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import {
+  Building2Icon,
   CheckIcon,
   ChevronDownIcon,
   PlusIcon,
@@ -91,6 +92,9 @@ export function OrgSwitcher({
           </DropdownMenuItem>
           <DropdownMenuItem render={<Link href="/settings/members" />}>
             <UsersIcon /> Kelola anggota
+          </DropdownMenuItem>
+          <DropdownMenuItem render={<Link href="/settings/organizations" />}>
+            <Building2Icon /> Kelola organisasi
           </DropdownMenuItem>
         </DropdownMenuGroup>
       </DropdownMenuContent>

@@ -1700,3 +1700,44 @@ create policy "ri admin write" on public.recurring_incomes
   for all using (public.org_role(organization_id) in ('owner','admin'))
   with check (public.org_role(organization_id) in ('owner','admin'));
 
+-- =========================================================================
+-- 0011: delete an organization (owner only, requires another org to land on)
+-- =========================================================================
+create or replace function public.delete_organization(p_org uuid)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_role public.sys_org_role;
+  v_other uuid;
+begin
+  v_role := public.org_role(p_org);
+  if v_role is null then
+    raise exception 'Bukan anggota organisasi ini';
+  end if;
+  if v_role <> 'owner' then
+    raise exception 'Hanya owner yang dapat menghapus organisasi. Gunakan Keluar untuk meninggalkannya.';
+  end if;
+
+  select om.organization_id into v_other
+    from public.organization_members om
+    where om.user_id = auth.uid() and om.organization_id <> p_org
+    order by om.joined_at
+    limit 1;
+  if v_other is null then
+    raise exception 'Tidak dapat menghapus organisasi satu-satunya Anda.';
+  end if;
+
+  update public.profiles
+    set active_organization_id = v_other
+    where id = auth.uid()
+      and (active_organization_id is null or active_organization_id = p_org);
+
+  delete from public.organizations where id = p_org;
+end;
+$$;
+
+grant execute on function public.delete_organization(uuid) to authenticated;
+

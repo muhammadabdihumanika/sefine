@@ -122,6 +122,22 @@ export async function leaveOrganization(orgId: string): Promise<ActionResult> {
   redirect("/");
 }
 
+/**
+ * Permanently delete an organization (owner only). Cascades to every org-scoped
+ * table. The RPC refuses if the caller owns no other org. Does NOT redirect so
+ * the management list can refresh in place with a toast.
+ */
+export async function deleteOrganization(orgId: string): Promise<ActionResult> {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("delete_organization", {
+    p_org: orgId,
+  });
+  if (error) return { error: friendlyError(error.message) };
+
+  revalidatePath("/", "layout");
+  return { ok: true };
+}
+
 /** Strip the Postgres context prefix to surface a clean message. */
 function friendlyError(message: string): string {
   return message.replace(/^ERROR:\s*/i, "").trim();

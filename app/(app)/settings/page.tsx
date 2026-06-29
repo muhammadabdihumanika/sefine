@@ -1,6 +1,7 @@
 import Link from "next/link";
 import {
   BotIcon,
+  Building2Icon,
   ChevronRightIcon,
   CoinsIcon,
   LogOutIcon,
@@ -26,6 +27,12 @@ type MenuItem = {
 };
 
 const menu: MenuItem[] = [
+  {
+    href: "/settings/organizations",
+    label: "Organisasi",
+    desc: "Kelola, hapus, atau keluar organisasi",
+    icon: Building2Icon,
+  },
   {
     href: "/settings/members",
     label: "Anggota & peran",
