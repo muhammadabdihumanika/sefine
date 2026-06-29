@@ -51,7 +51,7 @@ export async function createTransaction(
   });
   if (error) return { error: friendly(error.message) };
 
-  revalidatePath("/", "layout");
+  revalidatePath("/", "page");
   revalidatePath("/transactions", "page");
   return {};
 }
@@ -61,7 +61,7 @@ export async function deleteTransaction(id: string): Promise<Result> {
   const supabase = await createClient();
   const { error } = await supabase.rpc("delete_transaction", { p_id: id });
   if (error) return { error: friendly(error.message) };
-  revalidatePath("/", "layout");
+  revalidatePath("/", "page");
   revalidatePath("/transactions", "page");
   return {};
 }
@@ -83,7 +83,7 @@ export async function updateTransaction(args: {
     p_date: args.date,
   });
   if (error) return { error: friendly(error.message) };
-  revalidatePath("/", "layout");
+  revalidatePath("/", "page");
   revalidatePath("/transactions", "page");
   return { ok: true };
 }
@@ -120,7 +120,7 @@ export async function createAccount(
   });
   if (error) return { error: friendly(error.message) };
 
-  revalidatePath("/", "layout");
+  revalidatePath("/", "page");
   revalidatePath("/settings/accounts", "page");
   return { ok: true };
 }
@@ -147,7 +147,7 @@ export async function createCategory(
   });
   if (error) return { error: friendly(error.message) };
 
-  revalidatePath("/", "layout");
+  revalidatePath("/", "page");
   revalidatePath("/settings/categories", "page");
   return { ok: true };
 }
@@ -199,7 +199,7 @@ export async function reconcileAccount(
         }[]
       | null
   )?.[0];
-  revalidatePath("/", "layout");
+  revalidatePath("/", "page");
   revalidatePath("/settings/accounts", "page");
   return { ok: true, recorded: row?.recorded, diff: row?.diff };
 }
@@ -214,6 +214,6 @@ export async function archiveAccount(id: string): Promise<Result> {
     .eq("id", id);
   if (error) return { error: friendly(error.message) };
   revalidatePath("/settings/accounts", "page");
-  revalidatePath("/", "layout");
+  revalidatePath("/", "page");
   return { ok: true };
 }

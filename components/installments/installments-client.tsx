@@ -6,6 +6,7 @@ import { CheckIcon, CreditCardIcon, PlusIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { SubmitButton } from "@/components/ui/submit-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
@@ -49,7 +50,7 @@ export function InstallmentsClient({
   canManage: boolean;
   canPay: boolean;
 }) {
-  const [, start] = useTransition();
+  const [pending, start] = useTransition();
 
   return (
     <div className="space-y-4">
@@ -93,6 +94,7 @@ export function InstallmentsClient({
                     variant="outline"
                     size="sm"
                     className="mt-2 w-full"
+                    disabled={pending}
                     onClick={() =>
                       start(async () => {
                         const r = await payInstallment(i.id);
@@ -187,7 +189,7 @@ function AddInstallmentSheet({ activeOrgId }: { activeOrgId: string }) {
             <Picker value={accountId} placeholder="Tanpa akun" options={accounts} onChange={setAccountId} />
             <input type="hidden" name="account_id" value={accountId ?? ""} />
           </div>
-          <Button type="submit" size="lg" className="h-12 w-full">Simpan cicilan</Button>
+          <SubmitButton size="lg" className="h-12 w-full">Simpan cicilan</SubmitButton>
         </form>
       </SheetContent>
     </Sheet>

@@ -6,6 +6,7 @@ import { PlusIcon, TargetIcon, Trash2Icon } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { SubmitButton } from "@/components/ui/submit-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { GlassCard } from "@/components/glass/glass-card";
@@ -41,7 +42,7 @@ export function GoalsClient({
   currency: string;
   canManage: boolean;
 }) {
-  const [, start] = useTransition();
+  const [pending, start] = useTransition();
   const [open, setOpen] = React.useState(false);
   const [amounts, setAmounts] = React.useState<Record<string, string>>({});
   const [state, action] = useActionState(createGoal, { error: undefined });
@@ -88,9 +89,9 @@ export function GoalsClient({
                   <Label htmlFor="g-date">Target tanggal (opsional)</Label>
                   <Input id="g-date" name="target_date" type="date" className="h-11" />
                 </div>
-                <Button type="submit" size="lg" className="h-12 w-full">
+                <SubmitButton size="lg" className="h-12 w-full">
                   Simpan target
-                </Button>
+                </SubmitButton>
               </form>
             </SheetContent>
           </Sheet>
@@ -166,7 +167,7 @@ export function GoalsClient({
                     <Button
                       variant="outline"
                       size="sm"
-                      disabled={!amounts[g.id]}
+                      disabled={!amounts[g.id] || pending}
                       onClick={() =>
                         start(async () => {
                           const amt = Number(amounts[g.id] ?? 0);

@@ -79,7 +79,7 @@ export function TransactionList({
         const net = items.reduce((s, t) => s + signed(t), 0);
         return (
           <React.Fragment key={date}>
-          <div className="space-y-2">
+          <div className="cv-auto space-y-2">
             <div className="flex items-center justify-between px-1">
               <span className="text-xs font-medium text-muted-foreground">
                 {formatRelativeDay(date)}

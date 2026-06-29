@@ -4,7 +4,7 @@ import * as React from "react";
 import { useActionState } from "react";
 import { toast } from "sonner";
 
-import { Button } from "@/components/ui/button";
+import { SubmitButton } from "@/components/ui/submit-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { GlassCard } from "@/components/glass/glass-card";
@@ -80,9 +80,9 @@ export default function WelcomePage() {
               className="h-11"
             />
           </div>
-          <Button type="submit" size="lg" className="h-11 w-full">
+          <SubmitButton size="lg" className="h-11 w-full">
             Buat organisasi
-          </Button>
+          </SubmitButton>
           <p className="text-center text-xs text-muted-foreground">
             Anda menjadi owner dan dapat mengundang anggota lain.
           </p>
@@ -99,9 +99,9 @@ export default function WelcomePage() {
               className="h-11"
             />
           </div>
-          <Button type="submit" size="lg" className="h-11 w-full">
+          <SubmitButton size="lg" className="h-11 w-full">
             Gabung
-          </Button>
+          </SubmitButton>
           <p className="text-center text-xs text-muted-foreground">
             Minta kode dari owner/admin organisasi yang ingin Anda ikuti.
           </p>

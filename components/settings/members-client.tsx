@@ -14,6 +14,7 @@ import {
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { SubmitButton } from "@/components/ui/submit-button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { GlassCard } from "@/components/glass/glass-card";
@@ -130,10 +131,10 @@ export function MembersClient({
               placeholder="email@contoh.com"
               className="h-10"
             />
-            <Button type="submit" size="lg">
+            <SubmitButton size="lg">
               <UserPlusIcon className="size-4" />
               Tambah
-            </Button>
+            </SubmitButton>
           </form>
         </GlassCard>
       )}

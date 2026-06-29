@@ -58,7 +58,7 @@ export async function payBill(id: string): Promise<Result> {
   const { error } = await supabase.rpc("pay_bill", { p_bill: id });
   if (error) return { error: friendly(error.message) };
   revalidatePath("/bills", "page");
-  revalidatePath("/", "layout");
+  revalidatePath("/", "page");
   return { ok: true };
 }
 
@@ -149,7 +149,7 @@ export async function payInstallment(id: string): Promise<Result> {
   const { error } = await supabase.rpc("pay_installment", { p_installment: id });
   if (error) return { error: friendly(error.message) };
   revalidatePath("/settings/installments", "page");
-  revalidatePath("/", "layout");
+  revalidatePath("/", "page");
   return { ok: true };
 }
 
@@ -303,7 +303,7 @@ export async function receiveRecurringIncome(id: string): Promise<Result> {
   const supabase = await createClient();
   const { error } = await supabase.rpc("receive_recurring_income", { p_id: id });
   if (error) return { error: friendly(error.message) };
-  revalidatePath("/", "layout");
+  revalidatePath("/", "page");
   revalidatePath("/keuangan", "page");
   return { ok: true };
 }
@@ -332,7 +332,7 @@ export async function deleteBill(id: string): Promise<Result> {
   const { error } = await supabase.from("bills").delete().eq("id", id);
   if (error) return { error: friendly(error.message) };
   revalidatePath("/keuangan", "page");
-  revalidatePath("/", "layout");
+  revalidatePath("/", "page");
   return { ok: true };
 }
 

@@ -12,6 +12,7 @@ import {
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { SubmitButton } from "@/components/ui/submit-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
@@ -80,7 +81,7 @@ export function RecurringIncomesSection({
   canAct: boolean;
   activeOrgId: string;
 }) {
-  const [, start] = useTransition();
+  const [pending, start] = useTransition();
   const [addOpen, setAddOpen] = React.useState(false);
 
   const active = incomes
@@ -155,6 +156,7 @@ export function RecurringIncomesSection({
                       variant="outline"
                       size="sm"
                       className="flex-1"
+                      disabled={pending}
                       onClick={() =>
                         start(async () => {
                           const r = await receiveRecurringIncome(i.id);
@@ -168,6 +170,7 @@ export function RecurringIncomesSection({
                     <Button
                       variant="ghost"
                       size="sm"
+                      disabled={pending}
                       onClick={() =>
                         start(async () => {
                           const r = await skipRecurringIncome(i.id);
@@ -339,7 +342,7 @@ function AddRecurringIncomeSheet({
               </div>
             )}
           </div>
-          <Button type="submit" size="lg" className="h-12 w-full">Simpan</Button>
+          <SubmitButton size="lg" className="h-12 w-full">Simpan</SubmitButton>
         </form>
       </SheetContent>
     </Sheet>

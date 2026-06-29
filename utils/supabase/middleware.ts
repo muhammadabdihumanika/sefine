@@ -37,15 +37,21 @@ export async function updateSession(request: NextRequest) {
     },
   );
 
-  // IMPORTANT: do not run any code between createServerClient and getUser().
+  // Read the session from the cookie LOCALLY — no network round-trip per
+  // navigation. getSession() returns an *unverified* JWT, which is fine here
+  // because this proxy only does an optimistic redirect; the authoritative
+  // check (getUser + RLS) runs in the protected layouts/actions via
+  // requireUser(). getSession still returns the session object when the access
+  // token is merely expired (as long as the refresh token is valid), so it
+  // won't false-redirect to /login — getUser() refreshes it lazily in render.
   const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    data: { session },
+  } = await supabase.auth.getSession();
 
   const pathname = request.nextUrl.pathname;
 
   // Not logged in → send to login (except public routes).
-  if (!user && !isPublic(pathname)) {
+  if (!session && !isPublic(pathname)) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     url.searchParams.set("next", pathname);
@@ -53,7 +59,7 @@ export async function updateSession(request: NextRequest) {
   }
 
   // Logged in but visiting auth pages → send to app.
-  if (user && (pathname === "/login" || pathname === "/register")) {
+  if (session && (pathname === "/login" || pathname === "/register")) {
     const url = request.nextUrl.clone();
     url.pathname = "/";
     url.search = "";

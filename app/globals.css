@@ -289,6 +289,31 @@
   }
 }
 
+/* Respect users who prefer reduced motion: freeze the animated background
+   blobs and collapse transitions. Also a battery/thermal win on mobile. */
+@media (prefers-reduced-motion: reduce) {
+  .sefine-bg span {
+    animation: none;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Skip rendering/painting off-screen content. Apply to repeated list groups
+   (e.g. the 200-row transactions page) so the browser only lays out what is
+   visible — major scroll-smoothness win on mobile. `auto <size>` remembers the
+   real height after first paint and falls back to <size> until then. */
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 12rem;
+}
+
 /* hide scrollbars on horizontal rails while keeping scroll */
 .no-scrollbar {
   scrollbar-width: none;

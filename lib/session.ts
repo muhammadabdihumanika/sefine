@@ -1,4 +1,5 @@
 import "server-only";
+import { cache } from "react";
 import { redirect } from "next/navigation";
 
 import { createClient } from "@/utils/supabase/server";
@@ -30,8 +31,13 @@ export type SessionContext = {
  * Resolves the current user, their profile, memberships, and active org.
  * Safe to call anywhere server-side; returns nulls when not authenticated or
  * when the DB schema is not yet provisioned.
+ *
+ * Wrapped in React `cache()` so that when both the layout and the page (and
+ * any nested component) call requireActiveOrg()/requireUser() in the same
+ * request, the underlying getUser() + profile + memberships queries run ONCE
+ * instead of duplicating across each caller.
  */
-export async function getSessionContext(): Promise<SessionContext> {
+export const getSessionContext = cache(async (): Promise<SessionContext> => {
   const supabase = await createClient();
   const {
     data: { user },
@@ -84,7 +90,7 @@ export async function getSessionContext(): Promise<SessionContext> {
     memberships: list,
     isSuperAdmin: Boolean(profile?.is_super_admin),
   };
-}
+});
 
 /** Requires an authenticated user; redirects to /login otherwise. */
 export async function requireUser(): Promise<SessionContext> {

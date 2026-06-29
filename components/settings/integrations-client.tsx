@@ -12,6 +12,7 @@ import {
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { SubmitButton } from "@/components/ui/submit-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
@@ -325,9 +326,9 @@ function AiSection({
                 </button>
               </div>
             )}
-            <Button type="submit" size="lg" className="h-11 w-full">
+            <SubmitButton size="lg" className="h-11 w-full">
               Simpan konfigurasi
-            </Button>
+            </SubmitButton>
           </form>
 
           <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -396,9 +397,9 @@ function AiSection({
               <input type="hidden" name="provider" value={provider} />
               <Input name="model_id" required placeholder="model-id" className="h-10" />
               <Input name="label" placeholder="label" className="h-10" />
-              <Button type="submit" size="lg">
+              <SubmitButton size="lg">
                 Tambah
-              </Button>
+              </SubmitButton>
             </form>
           </div>
         </>

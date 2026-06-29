@@ -12,6 +12,7 @@ import {
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { SubmitButton } from "@/components/ui/submit-button";
 import { Input } from "@/components/ui/input";
 import { GlassCard } from "@/components/glass/glass-card";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -128,10 +129,10 @@ export function CategoriesClient({
               placeholder="Nama kategori"
               className="h-11"
             />
-            <Button type="submit" size="lg">
+            <SubmitButton size="lg">
               <PlusIcon className="size-4" />
               Tambah
-            </Button>
+            </SubmitButton>
           </form>
         </GlassCard>
       )}

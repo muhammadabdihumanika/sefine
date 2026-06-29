@@ -6,6 +6,7 @@ import { CheckIcon, PlusIcon, Trash2Icon, WalletIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { SubmitButton } from "@/components/ui/submit-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { GlassCard } from "@/components/glass/glass-card";
@@ -246,9 +247,9 @@ function AddAccountSheet() {
               />
             </div>
           </div>
-          <Button type="submit" size="lg" className="h-12 w-full">
+          <SubmitButton size="lg" className="h-12 w-full">
             Simpan rekening
-          </Button>
+          </SubmitButton>
         </form>
       </SheetContent>
     </Sheet>

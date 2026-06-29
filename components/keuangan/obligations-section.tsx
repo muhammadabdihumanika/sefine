@@ -181,7 +181,7 @@ function ObligationCard({
   canPay: boolean;
   canManage: boolean;
 }) {
-  const [, start] = useTransition();
+  const [pending, start] = useTransition();
   const Icon = KIND_ICON[o.kind];
   const status = dueStatus(o.date, o.isPaid);
   const d = o.date ? new Date(o.date + "T00:00:00") : null;
@@ -292,7 +292,7 @@ function ObligationCard({
 
       <div className="mt-2 flex gap-2">
         {!o.isPaid && canPay && (
-          <Button variant="outline" size="sm" className="flex-1" onClick={pay}>
+          <Button variant="outline" size="sm" className="flex-1" onClick={pay} disabled={pending}>
             <CheckIcon className="size-4" />
             {o.kind === "loan" ? "Tandai lunas" : "Bayar"}
           </Button>

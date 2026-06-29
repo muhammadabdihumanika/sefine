@@ -14,6 +14,7 @@ export default async function AccountsPage() {
     .from("account_balances")
     .select("*")
     .eq("organization_id", ctx.activeOrgId)
+    .eq("is_archived", false)
     .order("name");
 
   return (

@@ -6,6 +6,7 @@ import { CalendarClockIcon, CheckIcon, PlusIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { SubmitButton } from "@/components/ui/submit-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
@@ -97,7 +98,7 @@ export function BillsClient({
   canManage: boolean;
   canPay: boolean;
 }) {
-  const [, start] = useTransition();
+  const [pending, start] = useTransition();
 
   const active = bills.filter((b) => !b.is_paid);
   const done = bills.filter((b) => b.is_paid);
@@ -137,6 +138,7 @@ export function BillsClient({
                     bill={b}
                     currency={currency}
                     canPay={canPay}
+                    paying={pending}
                     onPay={() =>
                       start(async () => {
                         const r = await payBill(b.id);
@@ -162,6 +164,7 @@ export function BillsClient({
                     bill={b}
                     currency={currency}
                     canPay={false}
+                    paying={pending}
                     onPay={() => {}}
                   />
                 ))}
@@ -178,11 +181,13 @@ function BillCard({
   bill,
   currency,
   canPay,
+  paying,
   onPay,
 }: {
   bill: BillRow;
   currency: string;
   canPay: boolean;
+  paying: boolean;
   onPay: () => void;
 }) {
   const status = dueStatus(bill.next_due_date, bill.is_paid);
@@ -242,7 +247,7 @@ function BillCard({
       </div>
 
       {canPay && !bill.is_paid && (
-        <Button variant="outline" size="sm" className="mt-2 w-full" onClick={onPay}>
+        <Button variant="outline" size="sm" className="mt-2 w-full" onClick={onPay} disabled={paying}>
           <CheckIcon className="size-4" />
           Tandai lunas
         </Button>
@@ -364,7 +369,7 @@ function AddBillSheet({ activeOrgId }: { activeOrgId: string }) {
               Kosongkan “Sampai” agar tagihan berulang tanpa batas.
             </p>
           )}
-          <Button type="submit" size="lg" className="h-12 w-full">Simpan tagihan</Button>
+          <SubmitButton size="lg" className="h-12 w-full">Simpan tagihan</SubmitButton>
         </form>
       </SheetContent>
     </Sheet>
