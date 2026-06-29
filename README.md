@@ -1,36 +1,73 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sefine
 
-## Getting Started
+Web app **mobile-first** untuk mencatat keuangan pribadi & rumah tangga. Buat **organisasi** (keluarga/tim), undang anggota dengan **RBAC**, catat uang masuk/keluar/transfer, tagihan berulang, pinjaman, cicilan, anggaran & target. Fitur unggulan: **asisten AI** lewat **WhatsApp** dan **chat web** yang bisa baca data keuangan & input transaksi, dengan **pelacakan kredit** (fondasi langganan). Tema **liquid glass biru**, installable **PWA**.
 
-First, run the development server:
+> Panduan setup lengkap & verifikasi: **[`docs/DEPLOY.md`](docs/DEPLOY.md)**.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Fitur
+
+**Akun & organisasi**
+- Autentikasi (email + magic link + Google + password), profil otomatis.
+- Organisasi + undang anggota (kode undangan / email), ganti organisasi aktif.
+- RBAC: **owner / admin / member / viewer** (konfigurabel); plus **super admin** platform.
+- Keamanan: semua data org-scoped via **RLS** + RPC *security definer*.
+
+**Pencatatan keuangan**
+- Rekening (kas/bank/e-wallet/kredit/investasi), kategori (seed otomatis + akun default per kategori).
+- Transaksi: **masuk / keluar / transfer** (double-entry), quick-add via bottom-sheet, **edit** + **hapus (dengan konfirmasi)**.
+- **Tagihan** berulang sampai bulan tertentu, **pinjaman** (lent/borrowed), **cicilan** (progres x/n), **anggaran** (vs realisasi), **target tabungan**.
+- **Rekonsiliasi saldo**: samakan saldo tercatat dengan saldo nyata (auto catat penyesuaian).
+- Dashboard: total saldo, pemasukan vs pengeluaran, tagihan berikutnya, belanja per kategori, aktivitas terbaru. Realtime.
+
+**AI (multi-provider + kredit)**
+- **Chat web** (✨ di TopBar): sesi/riwayat percakapan, lanjut/buat baru, saran cepat, bisa **input transaksi**.
+- **Asisten WhatsApp** (Meta Cloud API): deteksi nomor → jawab info keuangan → catat transaksi (dengan konfirmasi "YA").
+- **Multi-provider**: Anthropic Claude / OpenAI / **OpenAI-compatible (mis. 9router via base URL kustom)**.
+- **Super admin** mengelola AI (key tersimpan **terenkripsi** di DB) + melihat **penggunaan kredit** per pengguna.
+
+**Tampilan**
+- Tema **liquid glass** biru (glassmorphism), terang/gelap, animasi background.
+- Mobile-first: bottom-nav, bottom-sheets, datepicker kalender, dialog konfirmasi, safe-area.
+- **PWA** installable + offline shell.
+
+## Stack
+
+- **Frontend:** Next.js 16 (App Router) · TypeScript · Tailwind CSS v4 · shadcn/ui (Base UI) · next-themes · recharts
+- **Backend:** Supabase (Postgres, Auth, RLS, Edge Functions/Deno, Realtime, Storage, Vault)
+- **AI:** abstraksi provider (Anthropic + OpenAI), tool-use keuangan, pelacakan kredit
+- **WhatsApp:** Meta Cloud API (webhook → Edge Function)
+
+## Struktur
+
+```
+app/            # rute App Router: (auth), (onboarding), (app){dashboard,transactions,bills,
+                #   keuangan(Tagihan/Anggaran/Target gabung), chat, settings/*}
+components/     # ui(shadcn), glass, shell, transactions, accounts, categories, bills, budgets,
+                #   goals, loans, installments, keuangan, chat, settings, auth, pwa
+lib/            # rbac, session, format, env
+utils/supabase/ # server.ts, client.ts, middleware.ts
+proxy.ts        # Next 16 (middleware → proxy)
+supabase/
+  migrations/   # 0001_init_core … 0010_recurring_income
+  all_in_one.sql# gabungan seluruh migrasi (tempel sekali)
+  functions/    # whatsapp-webhook, ai-chat, ai-test, _shared/ai (modular, untuk CLI)
+  dashboard/    # ai-test.ts, ai-chat.ts (self-contained, untuk deploy via Dashboard web)
+docs/DEPLOY.md  # setup & verifikasi lengkap
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Mulai
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm install
+cp .env.example .env.local   # isi URL + publishable key Supabase
+npm run dev                  # http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Lalu terapkan database + deploy fungsi AI mengikuti **[`docs/DEPLOY.md`](docs/DEPLOY.md)** (migrasi `all_in_one.sql`, Vault secret, super admin, deploy Edge Functions, konfigurasi AI).
 
-## Learn More
+## Catatan
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Publishable key** aman di browser (dilindungi RLS). **Service-role key** hanya di Edge Function.
+- Kunci API AI per-org/platform tersimpan **terenkripsi** (`platform_ai_config`), didekripsi hanya di Edge Function.
+- AI berjalan di Edge Function (cloud) → **tidak membaca `.env.local`**; key diisi di Pengaturan → Integrasi.
+- Skrip bash di repo menggunakan `npm`; supabase CLI dipakai untuk DB & deploy fungsi.
