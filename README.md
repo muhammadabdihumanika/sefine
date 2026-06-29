@@ -53,7 +53,8 @@ supabase/
   all_in_one.sql# gabungan seluruh migrasi (tempel sekali)
   functions/    # whatsapp-webhook, ai-chat, ai-test, _shared/ai (modular, untuk CLI)
   dashboard/    # ai-test.ts, ai-chat.ts (self-contained, untuk deploy via Dashboard web)
-docs/DEPLOY.md  # setup & verifikasi lengkap
+docs/DEPLOY.md   # setup & verifikasi backend lengkap
+docs/VERCEL.md   # deploy web app ke Vercel
 ```
 
 ## Mulai
@@ -65,6 +66,10 @@ npm run dev                  # http://localhost:3000
 ```
 
 Lalu terapkan database + deploy fungsi AI mengikuti **[`docs/DEPLOY.md`](docs/DEPLOY.md)** (migrasi `all_in_one.sql`, Vault secret, super admin, deploy Edge Functions, konfigurasi AI).
+
+## Deploy produksi (Vercel)
+
+Web app di-deploy ke **Vercel** (frontend saja; AI/WhatsApp tetap di Edge Function Supabase). Cukup 2 env var `NEXT_PUBLIC_*`. Panduan lengkap: **[`docs/VERCEL.md`](docs/VERCEL.md)** (CLI cepat / Git import + update URL redirect Auth).
 
 ## Mobile (Android)
 
