@@ -16,6 +16,7 @@ Web app **mobile-first** untuk mencatat keuangan pribadi & rumah tangga. Buat **
 - Rekening (kas/bank/e-wallet/kredit/investasi), kategori (seed otomatis + akun default per kategori).
 - Transaksi: **masuk / keluar / transfer** (double-entry), quick-add via bottom-sheet, **edit** + **hapus (dengan konfirmasi)**.
 - **Tagihan** berulang sampai bulan tertentu, **pinjaman** (lent/borrowed), **cicilan** (progres x/n), **anggaran** (vs realisasi), **target tabungan**.
+- **Pendapatan berulang** (gaji/langganan): tombol Terima (auto-catat pemasukan), Lewati (skip bulan ini), Hapus permanen.
 - **Rekonsiliasi saldo**: samakan saldo tercatat dengan saldo nyata (auto catat penyesuaian).
 - Dashboard: total saldo, pemasukan vs pengeluaran, tagihan berikutnya, belanja per kategori, aktivitas terbaru. Realtime.
 
@@ -43,7 +44,7 @@ Web app **mobile-first** untuk mencatat keuangan pribadi & rumah tangga. Buat **
 app/            # rute App Router: (auth), (onboarding), (app){dashboard,transactions,bills,
                 #   keuangan(Tagihan/Anggaran/Target gabung), chat, settings/*}
 components/     # ui(shadcn), glass, shell, transactions, accounts, categories, bills, budgets,
-                #   goals, loans, installments, keuangan, chat, settings, auth, pwa
+                #   goals, loans, installments, keuangan, chat, settings, auth, pwa, ads
 lib/            # rbac, session, format, env
 utils/supabase/ # server.ts, client.ts, middleware.ts
 proxy.ts        # Next 16 (middleware → proxy)
@@ -64,6 +65,18 @@ npm run dev                  # http://localhost:3000
 ```
 
 Lalu terapkan database + deploy fungsi AI mengikuti **[`docs/DEPLOY.md`](docs/DEPLOY.md)** (migrasi `all_in_one.sql`, Vault secret, super admin, deploy Edge Functions, konfigurasi AI).
+
+## Mobile (Android)
+
+Project **native Kotlin** (`com.evertahumanics.sefine`) ada di `android/` — WebView app (UI 100% identik web) + **AdMob** dengan 3 penempatan iklan:
+
+| Iklan | Lokasi | Trigger |
+|---|---|---|
+| **Banner atas** | Halaman Transaksi | `AdBanner` component → bridge `showTopBanner()` |
+| **Native card** | Di antara grup transaksi | `AdNativeCard` component (slot kartu "Ruang iklan") |
+| **Interstitial** | Saat tap nav "Saya" | `showInterstitial()` sebelum navigasi ke Settings |
+
+Bridge JS ↔ Kotlin (`window.Android`) menghubungkan web app → AdMob native. Lihat [`android/README.md`](android/README.md). Alternatif TWA: [`docs/ANDROID.md`](docs/ANDROID.md).
 
 ## Catatan
 

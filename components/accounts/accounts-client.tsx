@@ -2,13 +2,14 @@
 
 import * as React from "react";
 import { useActionState, useTransition } from "react";
-import { CheckIcon, PlusIcon, WalletIcon } from "lucide-react";
+import { CheckIcon, PlusIcon, Trash2Icon, WalletIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { GlassCard } from "@/components/glass/glass-card";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import {
   Sheet,
   SheetContent,
@@ -23,7 +24,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { createAccount, reconcileAccount } from "@/app/actions/finance";
+import { createAccount, archiveAccount, reconcileAccount } from "@/app/actions/finance";
 import { formatCurrency } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -110,9 +111,30 @@ export function AccountsClient({
                   {formatCurrency(Number(a.current_balance || 0), a.currency || currency)}
                 </span>
               </div>
-              {canReconcile && (
-                <ReconcileSheet account={a} currency={a.currency || currency} />
-              )}
+              <div className="mt-2 flex gap-2">
+                {canReconcile && (
+                  <div className="flex-1">
+                    <ReconcileSheet account={a} currency={a.currency || currency} />
+                  </div>
+                )}
+                {canManage && (
+                  <ConfirmDialog
+                    trigger={
+                      <Button variant="ghost" size="icon-sm" aria-label="Arsipkan rekening">
+                        <Trash2Icon className="size-4 text-muted-foreground" />
+                      </Button>
+                    }
+                    title="Arsipkan rekening?"
+                    description="Rekening disembunyikan dari daftar. Transaksi yang sudah dicatat tetap ada."
+                    confirmText="Arsipkan"
+                    onConfirm={async () => {
+                      const r = await archiveAccount(a.id);
+                      if (r?.error) toast.error(r.error);
+                      else toast.success("Rekening diarsipkan");
+                    }}
+                  />
+                )}
+              </div>
             </GlassCard>
           ))
         )}

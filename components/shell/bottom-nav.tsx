@@ -6,6 +6,7 @@ import { HomeIcon, LayoutGridIcon, PlusIcon, ReceiptIcon, UserIcon } from "lucid
 import type { ComponentType, SVGProps } from "react";
 
 import { cn } from "@/lib/utils";
+import { showInterstitial } from "@/lib/ads";
 import { useQuickAdd } from "@/components/transactions/quick-add-provider";
 
 type NavItem = {
@@ -48,11 +49,12 @@ const navLinks: NavItem[] = [
   },
 ];
 
-function NavLink({ item, active }: { item: NavItem; active: boolean }) {
+function NavLink({ item, active, onClick }: { item: NavItem; active: boolean; onClick?: () => void }) {
   const Icon = item.icon;
   return (
     <Link
       href={item.href}
+      onClick={onClick}
       className="flex flex-1 flex-col items-center gap-0.5 py-1.5"
     >
       <Icon
@@ -96,7 +98,12 @@ export function BottomNav() {
         </div>
 
         {navLinks.slice(2).map((item) => (
-          <NavLink key={item.href} item={item} active={item.active(pathname)} />
+          <NavLink
+            key={item.href}
+            item={item}
+            active={item.active(pathname)}
+            onClick={item.href === "/settings" ? () => showInterstitial() : undefined}
+          />
         ))}
       </div>
     </nav>

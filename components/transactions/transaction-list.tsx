@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/glass/glass-card";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { AdNativeCard } from "@/components/ads/ad-native-card";
 import { EditTransactionSheet } from "@/components/transactions/edit-transaction-sheet";
 import { deleteTransaction } from "@/app/actions/finance";
 import { formatCurrency, formatRelativeDay } from "@/lib/format";
@@ -74,10 +75,11 @@ export function TransactionList({
 
   return (
     <div className="space-y-4">
-      {groups.map(([date, items]) => {
+      {groups.map(([date, items], gi) => {
         const net = items.reduce((s, t) => s + signed(t), 0);
         return (
-          <div key={date} className="space-y-2">
+          <React.Fragment key={date}>
+          <div className="space-y-2">
             <div className="flex items-center justify-between px-1">
               <span className="text-xs font-medium text-muted-foreground">
                 {formatRelativeDay(date)}
@@ -107,6 +109,8 @@ export function TransactionList({
               ))}
             </GlassCard>
           </div>
+          {gi === 0 && <AdNativeCard />}
+        </React.Fragment>
         );
       })}
 

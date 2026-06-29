@@ -1,6 +1,7 @@
 import { requireActiveOrg } from "@/lib/session";
 import { createClient } from "@/utils/supabase/server";
 import { can } from "@/lib/rbac/permissions";
+import { AdBanner } from "@/components/ads/ad-banner";
 import {
   TransactionList,
   type TxRow,
@@ -27,6 +28,7 @@ export default async function TransactionsPage() {
 
   return (
     <div className="space-y-4">
+      <AdBanner />
       <h1 className="font-heading text-xl font-semibold">Transaksi</h1>
       <TransactionList
         transactions={(data ?? []) as unknown as TxRow[]}

@@ -8,14 +8,19 @@ import {
   CreditCardIcon,
   HandCoinsIcon,
   PlusIcon,
+  Trash2Icon,
 } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { GlassCard } from "@/components/glass/glass-card";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { AddObligationSheet } from "@/components/keuangan/add-obligation-sheet";
 import {
+  deleteBill,
+  deleteInstallment,
+  deleteLoan,
   payBill,
   payInstallment,
   setLoanStatus,
@@ -131,6 +136,7 @@ export function ObligationsSection({
               o={o}
               currency={currency}
               canPay={canPay}
+              canManage={canManage}
             />
           ))}
         </div>
@@ -148,6 +154,7 @@ export function ObligationsSection({
                 o={o}
                 currency={currency}
                 canPay={false}
+                canManage={canManage}
               />
             ))}
           </div>
@@ -167,10 +174,12 @@ function ObligationCard({
   o,
   currency,
   canPay,
+  canManage,
 }: {
   o: Obligation;
   currency: string;
   canPay: boolean;
+  canManage: boolean;
 }) {
   const [, start] = useTransition();
   const Icon = KIND_ICON[o.kind];
@@ -281,12 +290,33 @@ function ObligationCard({
         </div>
       </div>
 
-      {!o.isPaid && canPay && (
-        <Button variant="outline" size="sm" className="mt-2 w-full" onClick={pay}>
-          <CheckIcon className="size-4" />
-          {o.kind === "loan" ? "Tandai lunas" : "Bayar"}
-        </Button>
-      )}
+      <div className="mt-2 flex gap-2">
+        {!o.isPaid && canPay && (
+          <Button variant="outline" size="sm" className="flex-1" onClick={pay}>
+            <CheckIcon className="size-4" />
+            {o.kind === "loan" ? "Tandai lunas" : "Bayar"}
+          </Button>
+        )}
+        {canManage && (
+          <ConfirmDialog
+            trigger={
+              <Button variant="ghost" size="icon-sm" aria-label="Hapus">
+                <Trash2Icon className="size-4 text-destructive" />
+              </Button>
+            }
+            title={`Hapus ${o.kind === "bill" ? "tagihan" : o.kind === "installment" ? "cicilan" : "pinjaman"} ini?`}
+            description="Data akan dihapus permanen. Transaksi yang sudah dicatat tetap ada."
+            onConfirm={async () => {
+              let r: { error?: string } = {};
+              if (o.kind === "bill") r = await deleteBill(o.id);
+              else if (o.kind === "installment") r = await deleteInstallment(o.id);
+              else r = await deleteLoan(o.id);
+              if (r?.error) toast.error(r.error);
+              else toast.success("Dihapus");
+            }}
+          />
+        )}
+      </div>
     </GlassCard>
   );
 }

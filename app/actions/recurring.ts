@@ -325,3 +325,31 @@ export async function deleteRecurringIncome(id: string): Promise<Result> {
   revalidatePath("/keuangan", "page");
   return { ok: true };
 }
+
+export async function deleteBill(id: string): Promise<Result> {
+  await requireActiveOrg();
+  const supabase = await createClient();
+  const { error } = await supabase.from("bills").delete().eq("id", id);
+  if (error) return { error: friendly(error.message) };
+  revalidatePath("/keuangan", "page");
+  revalidatePath("/", "layout");
+  return { ok: true };
+}
+
+export async function deleteLoan(id: string): Promise<Result> {
+  await requireActiveOrg();
+  const supabase = await createClient();
+  const { error } = await supabase.from("loans").delete().eq("id", id);
+  if (error) return { error: friendly(error.message) };
+  revalidatePath("/keuangan", "page");
+  return { ok: true };
+}
+
+export async function deleteInstallment(id: string): Promise<Result> {
+  await requireActiveOrg();
+  const supabase = await createClient();
+  const { error } = await supabase.from("installments").delete().eq("id", id);
+  if (error) return { error: friendly(error.message) };
+  revalidatePath("/keuangan", "page");
+  return { ok: true };
+}

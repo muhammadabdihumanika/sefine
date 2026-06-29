@@ -210,9 +210,12 @@ function AiSection({
         setTestResult({ ok: false, msg: String(data?.error ?? "Gagal") });
       }
     } catch (e) {
+      const raw = e instanceof Error ? e.message : "Gagal menghubungi fungsi";
       setTestResult({
         ok: false,
-        msg: e instanceof Error ? e.message : "Gagal menghubungi fungsi",
+        msg: raw.includes("Failed to fetch")
+          ? "Gagal terhubung — deploy Edge Function 'ai-test' dulu."
+          : raw,
       });
     } finally {
       setTesting(false);

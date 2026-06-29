@@ -46,24 +46,29 @@ export function ChatClient({ orgId }: { orgId: string }) {
   const taRef = React.useRef<HTMLTextAreaElement>(null);
 
   async function loadConversations(): Promise<Conversation[]> {
-    const { data } = await supabase
-      .from("ai_conversations")
-      .select("id,title,updated_at")
-      .eq("organization_id", orgId)
-      .order("updated_at", { ascending: false })
-      .limit(50);
-    const list = (data ?? []) as Conversation[];
-    setConversations(list);
-    return list;
+    try {
+      const { data } = await supabase
+        .from("ai_conversations")
+        .select("id,title,updated_at")
+        .eq("organization_id", orgId)
+        .order("updated_at", { ascending: false })
+        .limit(50);
+      const list = (data ?? []) as Conversation[];
+      setConversations(list);
+      return list;
+    } catch {
+      return [];
+    }
   }
 
   async function loadMessages(convId: string) {
-    const { data } = await supabase
-      .from("ai_messages")
-      .select("role,content")
-      .eq("conversation_id", convId)
-      .order("created_at", { ascending: true })
-      .limit(100);
+    try {
+      const { data } = await supabase
+        .from("ai_messages")
+        .select("role,content")
+        .eq("conversation_id", convId)
+        .order("created_at", { ascending: true })
+        .limit(100);
     const msgs = ((data ?? []) as Array<{ role: string; content: { text?: string } | string }>)
       .filter((r) => r.role === "user" || r.role === "assistant")
       .map((r) => ({
@@ -71,6 +76,9 @@ export function ChatClient({ orgId }: { orgId: string }) {
         text: typeof r.content === "string" ? r.content : r.content?.text ?? "",
       }));
     setMessages(msgs);
+    } catch {
+      // silent — table may not exist yet
+    }
   }
 
   // initial load: continue the latest conversation
@@ -139,13 +147,11 @@ export function ChatClient({ orgId }: { orgId: string }) {
       ]);
       void loadConversations();
     } catch (e) {
-      setMessages((m) => [
-        ...m,
-        {
-          role: "assistant",
-          text: `⚠️ ${e instanceof Error ? e.message : "Gagal menghubungi asisten"}`,
-        },
-      ]);
+      const raw = e instanceof Error ? e.message : "Gagal menghubungi asisten";
+      const friendly = raw.includes("Failed to fetch")
+        ? "⚠️ Gagal terhubung ke server AI. Pastikan Edge Function 'ai-chat' sudah di-deploy di Supabase."
+        : `⚠️ ${raw}`;
+      setMessages((m) => [...m, { role: "assistant", text: friendly }]);
     } finally {
       setPending(false);
       setTimeout(() => taRef.current?.focus(), 0);

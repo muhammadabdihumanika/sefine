@@ -203,3 +203,17 @@ export async function reconcileAccount(
   revalidatePath("/settings/accounts", "page");
   return { ok: true, recorded: row?.recorded, diff: row?.diff };
 }
+
+/** Archive an account (soft delete — transactions remain). */
+export async function archiveAccount(id: string): Promise<Result> {
+  await requireActiveOrg();
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("accounts")
+    .update({ is_archived: true })
+    .eq("id", id);
+  if (error) return { error: friendly(error.message) };
+  revalidatePath("/settings/accounts", "page");
+  revalidatePath("/", "layout");
+  return { ok: true };
+}
