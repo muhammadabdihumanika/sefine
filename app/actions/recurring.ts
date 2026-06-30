@@ -122,12 +122,11 @@ export async function createInstallment(
   const installmentAmount = Number(
     String(formData.get("installment_amount") ?? "").replace(/\D/g, "") || 0,
   );
-  const accountId = formData.get("account_id")
-    ? String(formData.get("account_id"))
-    : null;
+  const accountId = String(formData.get("account_id") ?? "");
 
   if (!name || !principal || !termMonths || !installmentAmount)
     return { error: "Lengkapi data cicilan." };
+  if (!accountId) return { error: "Pilih akun pembayaran." };
 
   const { error } = await supabase.from("installments").insert({
     organization_id: ctx.activeOrgId,

@@ -142,7 +142,12 @@ function AddInstallmentSheet({ activeOrgId }: { activeOrgId: string }) {
         .eq("organization_id", activeOrgId)
         .eq("is_archived", false)
         .order("name");
-      setAccounts((data ?? []).map((x: { id: string; name: string }) => ({ value: x.id, label: x.name })));
+      const list = (data ?? []).map((x: { id: string; name: string }) => ({
+        value: x.id,
+        label: x.name,
+      }));
+      setAccounts(list);
+      setAccountId((prev) => prev ?? list[0]?.value ?? null);
     })();
   }, [activeOrgId]);
 
@@ -185,8 +190,8 @@ function AddInstallmentSheet({ activeOrgId }: { activeOrgId: string }) {
             <Input id="i-emi" name="installment_amount" required inputMode="numeric" placeholder="0" className="h-11" />
           </div>
           <div className="space-y-1.5">
-            <Label className="text-xs text-muted-foreground">Akun (opsional)</Label>
-            <Picker value={accountId} placeholder="Tanpa akun" options={accounts} onChange={setAccountId} />
+            <Label className="text-xs text-muted-foreground">Bayar dari akun</Label>
+            <Picker value={accountId} placeholder="Pilih akun" options={accounts} onChange={setAccountId} />
             <input type="hidden" name="account_id" value={accountId ?? ""} />
           </div>
           <SubmitButton size="lg" className="h-12 w-full">Simpan cicilan</SubmitButton>

@@ -230,6 +230,17 @@ function BillForm(props: {
           <Field label="Sampai (opsional)"><Input name="end_date" type="date" className="h-11" /></Field>
         )}
       </div>
+      {props.frequency !== "once" && (
+        <p className="-mt-1 text-[0.7rem] text-muted-foreground">
+          Kosongkan tanggal akhir agar tagihan berulang tanpa batas (setiap{" "}
+          {props.frequency === "weekly"
+            ? "minggu"
+            : props.frequency === "yearly"
+              ? "tahun"
+              : "bulan"}
+          ).
+        </p>
+      )}
       <Button type="submit" size="lg" className="h-12 w-full" disabled={props.pending}>Simpan tagihan</Button>
     </form>
   );
@@ -257,8 +268,8 @@ function InstallmentForm(props: {
         <Field label="Tenor (bln)"><Input name="term_months" required inputMode="numeric" placeholder="12" className="h-11" /></Field>
       </div>
       <Field label="Cicilan /bln"><Input name="installment_amount" required inputMode="numeric" placeholder="0" className="h-11" /></Field>
-      <Field label="Akun (opsional)">
-        <Picker value={props.accountId} placeholder="Tanpa akun" options={props.accounts} onChange={props.setAccountId} />
+      <Field label="Bayar dari akun">
+        <Picker value={props.accountId} placeholder="Pilih akun" options={props.accounts} onChange={props.setAccountId} />
         <input type="hidden" name="account_id" value={props.accountId ?? ""} />
       </Field>
       <Button type="submit" size="lg" className="h-12 w-full" disabled={props.pending}>Simpan cicilan</Button>
